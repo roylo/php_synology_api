@@ -166,6 +166,8 @@ class RestClient implements Iterator, ArrayAccess {
         }
         $curlopt[CURLOPT_URL] = $client->url;
 
+        echo $client->url ."\n";
+
         if($client->options['curl_options']){
             // array_merge would reset our numeric keys.
             foreach($client->options['curl_options'] as $key => $value){

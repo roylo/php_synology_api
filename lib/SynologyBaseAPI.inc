@@ -30,7 +30,7 @@ class SynologyBaseAPI
 
     public function __destruct()
     { //{{{
-        $this->_doAuth($this->_session_name, "login");
+        $this->logout($this->_session_name);
     } //}}}
 
     public function login($account, $passwd, $session_name, $cookie_file)
@@ -81,7 +81,7 @@ class SynologyBaseAPI
         return $result;
     } //}}}
 
-    private function _init_req($api_name, $version, $method)
+    protected function _init_req($api_name, $version, $method)
     { //{{{
         $req = array(
             "api" => $api_name,
@@ -92,7 +92,7 @@ class SynologyBaseAPI
         return $req;
     } //}}}
 
-    private function _get_basic_info($api_name, &$version, &$path)
+    protected function _get_basic_info($api_name, &$version, &$path)
     { //{{{
         if (isset($this->_api_info[$api_name])) {
             $version = $this->_api_info[$api_name]['maxVersion'];
