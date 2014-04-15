@@ -1,11 +1,13 @@
 <?php
 
-require_once dirname(__FILE__) . '/rest_client.inc';
+require_once dirname(__FILE__) . '/RestClient.inc';
 
-class SynologyAPI
+class SynologyBaseAPI
 {
-    private $_ws_client;
-    private $_api_info;
+    protected $_ws_client;
+    protected $_api_info;
+    protected $_session_name;
+    protected $_sid;
 
     public function __construct($host = null, $port = null)
     { //{{{
@@ -15,20 +17,40 @@ class SynologyAPI
         if (empty($port)) {
             $port = 3565;
         }
-        $curl_opt = array(
-            CURLOPT_COOKIEJAR => "cookie.txt",
-            CURLOPT_COOKIEFILE => "cookie.txt",
-        );
         $opt = array(
                   "base_url" => "$host:$port",
                   "format"   => "json",
-                  "curl_options" => $curl_opt,
                );
         $this->_ws_client = new RestClient($opt);
         $this->_ws_client->register_decoder('json',
             create_function('$json_arr', "return json_decode(\$json_arr, TRUE);"));
 
         $this->getApiAuthInfo();
+    } //}}}
+
+    public function __destruct()
+    { //{{{
+        $this->_doAuth($this->_session_name, "login");
+    } //}}}
+
+    public function login($account, $passwd, $session_name, $cookie_file)
+    { //{{{
+        $curl_opt = array(
+            CURLOPT_COOKIEJAR => $cookie_file,
+            CURLOPT_COOKIEFILE => $cookie_file,
+        );
+        $this->_ws_client->set_option("curl_options", $curl_opt);
+        $ret = $this->_doAuth($session_name, "login", $account, $passwd);
+        if ($ret['success']) {
+            $this->_session_name = $session_name;
+            $this->_sid = $ret['data']['sid'];
+        }
+        return $ret['success'];
+    } //}}}
+
+    public function logout($session_name)
+    { //{{{
+        return $this->_doAuth($session_name, "logout");
     } //}}}
 
     public function getApiAuthInfo()
@@ -40,24 +62,23 @@ class SynologyAPI
 
         $result = $this->_ws_client->get("webapi/query.cgi", $req);
         $this->_api_info = $result['data'];
-        print_r($this->_api_info);
         return $result;
     } //}}}
 
-    public function doAuth($session_name, $method)
+    private function _doAuth($session_name, $method, $account = null, $passwd = null)
     { //{{{
         $api_name = "SYNO.API.Auth";
         $this->_get_basic_info($api_name, $version, $path);
 
         $req = $this->_init_req($api_name, $version, $method);
         if ($method == "login") {
-            $req["account"] = "roylo";
-            $req["passwd"] = "2aoiurxi";
+            $req["account"] = $account;
+            $req["passwd"] = $passwd;
             $req["format"] = "cookie";
         }
         $req["session"] = $session_name;
         $result = $this->_ws_client->post("webapi/$path", $req);
-        print_r($result);
+        return $result;
     } //}}}
 
     private function _init_req($api_name, $version, $method)
@@ -82,9 +103,4 @@ class SynologyAPI
     } //}}}
 }
 
-$ss = new SynologyAPI();
-$res = $ss->doAuth("FileStation", "login");
-print_r($res);
-//$res = $ss->doAuth("FileStation", "logout");
-//print_r($res);
 
