@@ -81,6 +81,18 @@ class SynologyBaseAPI
         return $result;
     } //}}}
 
+    protected function _execute($api_name, $method, $required_arr, $opt_arr = null)
+    {
+        $this->_get_basic_info($api_name, $version, $path);
+        $req = $this->_init_req($api_name, $version, $method);
+        $req = array_merge($req, $required_arr);
+        if (is_array($opt_arr)) {
+            $req = array_merge($req, $opt_arr);
+        }
+        $result = $this->_ws_client->get("webapi/$path", $req);
+        return $result;
+    }
+
     protected function _init_req($api_name, $version, $method)
     { //{{{
         $req = array(

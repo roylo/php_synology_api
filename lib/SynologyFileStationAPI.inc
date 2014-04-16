@@ -9,34 +9,50 @@ class SynologyFileStationAPI extends SynologyBaseAPI
         parent::__construct();
     }
 
-    public function search($folder_path, $opt_parameters = null)
+    public function searchStart($folder_path, $opt_arr = null)
     { //{{{
         $api_name = "SYNO.FileStation.Search";
         $method = "start";
-        $this->_get_basic_info($api_name, $version, $path);
-        $req = $this->_init_req($api_name, $version, $method);
+        $required_arr = array(
+            "folder_path" => $folder_path,
+        );
 
-        $req["folder_path"] = $folder_path;
-        if (is_array($opt_parameters)) {
-            $req = array_merge($req, $opt_parameters);
-        }
-        $result = $this->_ws_client->get("webapi/$path", $req);
-        return $result;
+        return $this->_execute($api_name, $method, $required_arr, $opt_arr);
     } //}}}
 
-    public function searchList($taskid, $opt_parameters = null)
+    public function searchList($taskid, $opt_arr = null)
     { //{{{
         $api_name = "SYNO.FileStation.Search";
         $method = "list";
-        $this->_get_basic_info($api_name, $version, $path);
-        $req = $this->_init_req($api_name, $version, $method);
-        $req["taskid"] = $taskid;
+        $required_arr = array(
+            "taskid" => $taskid,
+        );
 
-        if (is_array($opt_parameters)) {
-            $req = array_merge($req, $opt_parameters);
-        }
-        $result = $this->_ws_client->get("webapi/$path", $req);
-        return $result;
+        return $this->_execute($api_name, $method, $required_arr, $opt_arr);
+    } //}}}
+
+    public function fileList($folder_path, $opt_arr = null)
+    { //{{{
+        $api_name = "SYNO.FileStation.List";
+        $method = "list";
+        $required_arr = array(
+            "folder_path" => $folder_path,
+        );
+
+        return $this->_execute($api_name, $method, $required_arr, $opt_arr);
+    } //}}}
+
+    public function copyMoveStart($path, $dest_path, $remove_src = true, $opt_arr = null)
+    { //{{{
+        $api_name = "SYNO.FileStation.CopyMove";
+        $method = "start";
+        $required_arr = array(
+            "path" => $path,
+            "dest_folder_path" => $dest_path,
+            "remove_src" => $remove_src,
+        );
+
+        return $this->_execute($api_name, $method, $required_arr, $opt_arr);
     } //}}}
 }
 

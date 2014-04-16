@@ -144,7 +144,6 @@ class RestClient implements Iterator, ArrayAccess {
 
 //        if($client->options['format'])
 //            $client->url .= '.'.$client->options['format'];
-
         $parameters = array_merge($client->options['parameters'], $parameters);
         if(strtoupper($method) == 'POST'){
             $curlopt[CURLOPT_POST] = TRUE;
@@ -194,6 +193,9 @@ class RestClient implements Iterator, ArrayAccess {
     public function format_query($parameters, $primary='=', $secondary='&'){
         $query = "";
         foreach($parameters as $key => $value){
+            if (gettype($value) == "boolean") {
+                $value = ($value == true) ? "true" : "false";
+            }
             $pair = array(urlencode($key), urlencode($value));
             $query .= implode($primary, $pair) . $secondary;
         }
