@@ -54,6 +54,27 @@ class SynologyFileStationAPI extends SynologyBaseAPI
 
         return $this->_execute($api_name, $method, $required_arr, $opt_arr);
     } //}}}
+
+    public function archiveList($path, $opt_arr = null)
+    { //{{{
+        $api_name = "SYNO.FileStation.Extract";
+        $method = "list";
+        $required_arr = array(
+            "file_path" => $path,
+        );
+        return $this->_execute($api_name, $method, $required_arr, $opt_arr);
+    } //}}}
+
+    public function archiveExtract($path, $dest_path, $opt_arr = null)
+    { //{{{
+        $api_name = "SYNO.FileStation.Extract";
+        $method = "start";
+        $required_arr = array(
+            "file_path" => $path,
+            "dest_folder_path" => $dest_path,
+        );
+        return $this->_execute($api_name, $method, $required_arr, $opt_arr);
+    } //}}}
 }
 
 
