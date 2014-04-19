@@ -9,7 +9,7 @@ class SynologyFileStationAPI extends SynologyBaseAPI
         parent::__construct();
     }
 
-    public function searchStart($folder_path, $opt_arr = null)
+    public function startSearch($folder_path, $opt_arr = null)
     { //{{{
         $api_name = "SYNO.FileStation.Search";
         $method = "start";
@@ -20,7 +20,7 @@ class SynologyFileStationAPI extends SynologyBaseAPI
         return $this->_execute($api_name, $method, $required_arr, $opt_arr);
     } //}}}
 
-    public function searchList($taskid, $opt_arr = null)
+    public function listSearch($taskid, $opt_arr = null)
     { //{{{
         $api_name = "SYNO.FileStation.Search";
         $method = "list";
@@ -31,7 +31,7 @@ class SynologyFileStationAPI extends SynologyBaseAPI
         return $this->_execute($api_name, $method, $required_arr, $opt_arr);
     } //}}}
 
-    public function fileList($folder_path, $opt_arr = null)
+    public function listFile($folder_path, $opt_arr = null)
     { //{{{
         $api_name = "SYNO.FileStation.List";
         $method = "list";
@@ -42,7 +42,7 @@ class SynologyFileStationAPI extends SynologyBaseAPI
         return $this->_execute($api_name, $method, $required_arr, $opt_arr);
     } //}}}
 
-    public function copyMoveStart($path, $dest_path, $remove_src = true, $opt_arr = null)
+    public function StartCopyMove($path, $dest_path, $remove_src = true, $opt_arr = null)
     { //{{{
         $api_name = "SYNO.FileStation.CopyMove";
         $method = "start";
@@ -55,7 +55,7 @@ class SynologyFileStationAPI extends SynologyBaseAPI
         return $this->_execute($api_name, $method, $required_arr, $opt_arr);
     } //}}}
 
-    public function archiveList($path, $opt_arr = null)
+    public function listArchive($path, $opt_arr = null)
     { //{{{
         $api_name = "SYNO.FileStation.Extract";
         $method = "list";
@@ -65,7 +65,7 @@ class SynologyFileStationAPI extends SynologyBaseAPI
         return $this->_execute($api_name, $method, $required_arr, $opt_arr);
     } //}}}
 
-    public function archiveExtract($path, $dest_path, $opt_arr = null)
+    public function extractArchive($path, $dest_path, $opt_arr = null)
     { //{{{
         $api_name = "SYNO.FileStation.Extract";
         $method = "start";
@@ -74,6 +74,51 @@ class SynologyFileStationAPI extends SynologyBaseAPI
             "dest_folder_path" => $dest_path,
         );
         return $this->_execute($api_name, $method, $required_arr, $opt_arr);
+    } //}}}
+
+    public function getArchiveStatus($task_id, $opt_arr = null)
+    { //{{{
+        $api_name = "SYNO.FileStation.Compress";
+        $method = "status";
+        $required_arr = array(
+            "taskid" => $task_id,
+        );
+        return $this->_execute($api_name, $method, $required_arr, $opt_arr);
+    } //}}}
+
+    public function createFolder($folder_path, $name, $opt_arr = null)
+    { //{{{
+        $api_name = "SYNO.FileStation.CreateFolder";
+        $method = "create";
+        $required_arr = array(
+            "folder_path" => $folder_path,
+            "name"        => $name,
+        );
+        return $this->_execute($api_name, $method, $required_arr, $opt_arr);
+    } //}}}
+
+    public function checkFileExist($folder_path, $name, $is_dir = false)
+    { //{{{
+        $search_opt = array(
+            "filetype" => ($is_dir == true) ? "dir" : "file",
+            "additional" => "real_path,type",
+        );
+        $ret = $this->listFile($folder_path, $search_opt);
+
+        if (!$ret["success"]) {
+            return false;
+        }
+
+        foreach($ret["data"]["files"] as $file) {
+            if ($file["isdir"] != $is_dir) {
+                continue;
+            }
+            if ($file["name"] == $name) {
+                return true;
+            }
+        }
+
+        return false;
     } //}}}
 }
 
