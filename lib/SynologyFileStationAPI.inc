@@ -120,6 +120,16 @@ class SynologyFileStationAPI extends SynologyBaseAPI
 
         return false;
     } //}}}
+
+    public function deleteFile($path, $opt_arr = null)
+    { //{{{
+        $api_name = "SYNO.FileStation.Delete";
+        $method = "start";
+        $required_arr = array(
+            "path" => $path,
+        );
+        return $this->_execute($api_name, $method, $required_arr, $opt_arr);
+    } //}}}
 }
 
 

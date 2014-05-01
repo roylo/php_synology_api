@@ -16,6 +16,16 @@ $login_info = array(
 );
 
 $tv_handler = new TVShowHandler(null, $login_info);
-$folder_path = "/program/subtitleCron/castle";
-$tv_handler->processSubtitleFiles($folder_path);
+
+//---------- tv shows --------------
+$download_folder = "/download/TVshows";
+$tv_handler->dispatchTvShows($download_folder);
+
+//---------- subtitles -------------
+$subtitle_path = "/program/subtitleFetcher/data/subtitles";
+$tvshow_folders = $tv_handler->listFile($subtitle_path, "dir");
+foreach ($tvshow_folders['data']['files'] as $tvshow_info) {
+    $tv_handler->processSubtitleFiles($tvshow_info['path']);
+}
+
 ?>

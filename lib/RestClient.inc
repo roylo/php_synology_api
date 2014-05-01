@@ -165,7 +165,6 @@ class RestClient implements Iterator, ArrayAccess {
         }
         $curlopt[CURLOPT_URL] = $client->url;
 
-        echo $client->url ."\n";
 
         if($client->options['curl_options']){
             // array_merge would reset our numeric keys.
@@ -196,7 +195,7 @@ class RestClient implements Iterator, ArrayAccess {
             if (gettype($value) == "boolean") {
                 $value = ($value == true) ? "true" : "false";
             }
-            $pair = array(urlencode($key), urlencode($value));
+            $pair = array(urlencode($key), rawurlencode($value));
             $query .= implode($primary, $pair) . $secondary;
         }
         return rtrim($query, $secondary);
